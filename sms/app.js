@@ -4,11 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var scheduler = require('./scheduler');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var sms = require('./routes/sms');
+var appointments = require('./routes/appointments');
 
 
 var app = express();
@@ -28,6 +29,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/sms',sms);
+//1 se guarda una cita.
+//On the start function of scheduler both the job code we'd like to run, and the interval on which to run it.
+//To actually execute our recurring job logic, we create a worker function to query the database for upcoming appointments and sends reminders as necessary.
+//se llama el apointent.sendNotifications en models.
+app.use('/appointments',appointments);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -60,5 +66,5 @@ app.use(function(err, req, res, next) {
   });
 });
 
-
+scheduler.start();
 module.exports = app;
